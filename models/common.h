@@ -3,9 +3,11 @@
 #ifndef common_h__
 #define common_h__
 
+#ifndef UNIT_TEST
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#endif
 
 #include "../lib/avr_extra.h"
 #include "../lib/keycode.h"
@@ -66,27 +68,55 @@
    |-----------------------------------------------------------| ,-----------. |-----------| n |
    |Ctl|Gui|Alt|          Space                |Alt|Gui|App|Ctl| |Lef|Dow|Rig| | 0     | . | t |
    `-----------------------------------------------------------' `-----------' `---------------'  */
-#define ANSI_ISO_JIS \
+
+// ==== ANSI ISO JIS ===================================================================================================
+#define ANSI_ISO_JIS {\
   KEYMAP(ESC,        F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12,  PSCR,SLCK,PAUS,                       \
          GRV,    1,   2,   3,   4,   5,   6,   7,   8,   9,   0,MINS, EQL,BSPC,   INS,HOME,PGUP,  NLCK,PSLS,PAST,PMNS, \
          TAB,    Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,LBRC,RBRC,BSLS,   DEL, END,PGDN,    P7,  P8,  P9,PPLS, \
          CAPS,   A,   S,   D,   F,   G,   H,   J,   K,   L,SCLN,QUOT,      ENT,                     P4,  P5,  P6,      \
          LSFT,NUBS,   Z,   X,   C,   V,   B,   N,   M,COMM, DOT,SLSH,     RSFT,          UP,        P1,  P2,  P3,PENT, \
-         LCTL,LGUI,LALT,                SPC,               RALT,RGUI, APP,RCTL,   LEFT,DOWN,RGHT,   P0,     PDOT       )
+         LCTL,LGUI,LALT,                SPC,               RALT,RGUI, APP,RCTL,   LEFT,DOWN,RGHT,   P0,     PDOT       )}
 
-#define DVORAK \
+
+// ==== DVORAK =========================================================================================================
+#define DVORAK {\
   KEYMAP(ESC,        F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12,  PSCR,SLCK,PAUS,                       \
          GRV,    1,   2,   3,   4,   5,   6,   7,   8,   9,   0,LBRC,RBRC,BSPC,   INS,HOME,PGUP,  NLCK,PSLS,PAST,PMNS, \
          TAB, QUOT,COMM, DOT,   P,   Y,   F,   G,   C,   R,   L,SLSH, EQL,BSLS,   DEL, END,PGDN,    P7,  P8,  P9,PPLS, \
          CAPS,   A,   O,   E,   U,   I,   D,   H,   T,   N,   S,MINS,      ENT,                     P4,  P5,  P6,      \
          LSFT,NUBS,SCLN,   Q,   J,   K,   X,   B,   M,   W,   V,   Z,     RSFT,         UP,         P1,  P2,  P3,PENT, \
-         LCTL,LGUI,LALT,                SPC,               RALT,RGUI, APP,RCTL,  LEFT,DOWN,RGHT)    P0,     PDOT       )
+         LCTL,LGUI,LALT,                SPC,               RALT,RGUI, APP,RCTL,  LEFT,DOWN,RGHT)    P0,     PDOT       )}
+
+
+// ==== Space FN =======================================================================================================
+#define KC_SPCFN1   TLAYER(1, KEY_SPACE)                                        /*Tap to space, hold switch to Layer 1*/
+#define KC_APP1     TLAYER(1, KEY_APPLICATION)                            /*Tap to Application, hold switch to Layer 1*/
+// ---------------------------------------------------------------------------------------------------------------------
+#define SPACE_FN {\
+  /*--- Layer 0 ----------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(ESC,         0,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12,  PSCR,SLCK,PAUS,                       \
+         ESC,    1,   2,   3,   4,   5,   6,   7,   8,   9,   0,MINS, EQL,BSPC,   INS,HOME,PGUP,  NLCK,PSLS,PAST,PMNS, \
+         TAB,    Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,LBRC,RBRC,BSLS,   DEL, END,PGDN,    P7,  P8,  P9,PPLS, \
+         CAPS,   A,   S,   D,   F,   G,   H,   J,   K,   L,SCLN,QUOT,      ENT,                     P4,  P5,  P6,      \
+         LSFT,NUBS,   Z,   X,   C,   V,   B,   N,   M,COMM, DOT,SLSH,     RSFT,         UP,         P1,  P2,  P3,PENT, \
+         LCTL,LGUI,LALT,             SPCFN1,               RALT,RGUI,APP1,RCTL,  LEFT,DOWN,RGHT,    P0,     PDOT     ),\
+  /*--- Layer 1 ----------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(ESC,         0,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12,  PSCR,SLCK,PAUS,                       \
+         ESC,   F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, DEL,   INS,HOME,PGUP,  NLCK,PSLS,PAST,PMNS, \
+         TAB,    Q,   W, ESC,   R,   T,   Y,HOME,  UP, END,PSCR,SLCK,PAUS, INS,   DEL, END,PGDN,    P7,  P8,  P9,PPLS, \
+         CAPS,   A,   S,   D,   F,   G,PGUP,LEFT,DOWN,RGHT,SCLN,QUOT,      ENT,                     P4,  P5,  P6,      \
+         LSFT,NUBS,   Z,   X,   C, SPC,PGDN, GRV,sGRV,COMM, DOT, APP,     RSFT,          UP,        P1,  P2,  P3,PENT, \
+         LCTL,LGUI,LALT,                SPC,               RALT,RGUI,APP1,RCTL,   LEFT,DOWN,RGHT,   P0,     PDOT     ),\
+  }
+
+
 
 /* Test layouts to easily find the position of keys in the underlying
    matrix. */
 #define TEST_COLS \
 /*  COL 0   COL 1   COL 2   COL 3   COL 4   COL 5   COL 6   COL 7 */ \
-  { \
+  {{ \
     KC_0,   KC_1,   KC_2,   KC_3,   KC_4,   KC_5,   KC_6,   KC_7,   /* ROW A */ \
     KC_0,   KC_1,   KC_2,   KC_3,   KC_4,   KC_5,   KC_6,   KC_7,   /* ROW B */ \
     KC_0,   KC_1,   KC_2,   KC_3,   KC_4,   KC_5,   KC_6,   KC_7,   /* ROW C */ \
@@ -105,10 +135,10 @@
     KC_0,   KC_1,   KC_2,   KC_3,   KC_4,   KC_5,   KC_6,   KC_7,   /* ROW P */ \
     KC_0,   KC_1,   KC_2,   KC_3,   KC_4,   KC_5,   KC_6,   KC_7,   /* ROW Q */ \
     KC_0,   KC_1,   KC_2,   KC_3,   KC_4,   KC_5,   KC_6,   KC_7    /* ROW R */ \
-  };
+  }};
 #define TEST_ROWS \
 /*  COL 0   COL 1   COL 2   COL 3   COL 4   COL 5   COL 6   COL 7 */ \
-  { \
+  {{ \
     KC_A,   KC_A,   KC_A,   KC_A,   KC_A,   KC_A,   KC_A,   KC_A,   /* ROW A */ \
     KC_B,   KC_B,   KC_B,   KC_B,   KC_B,   KC_B,   KC_B,   KC_B,   /* ROW B */ \
     KC_C,   KC_C,   KC_C,   KC_C,   KC_C,   KC_C,   KC_C,   KC_C,   /* ROW C */ \
@@ -127,6 +157,6 @@
     KC_P,   KC_P,   KC_P,   KC_P,   KC_P,   KC_P,   KC_P,   KC_P,   /* ROW P */ \
     KC_Q,   KC_Q,   KC_Q,   KC_Q,   KC_Q,   KC_Q,   KC_Q,   KC_Q,   /* ROW Q */ \
     KC_R,   KC_R,   KC_R,   KC_R,   KC_R,   KC_R,   KC_R,   KC_R    /* ROW R */ \
-  };
+  }};
 
 #endif

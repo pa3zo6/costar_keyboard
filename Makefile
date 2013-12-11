@@ -5,12 +5,13 @@
 
 ## Keyboard models. Un-comment the options you want.
 
-#MODEL = flake
-MODEL = hoof
+MODEL = flake
+#MODEL = hoof
 #MODEL = paw
 #MODEL = petal
 
-LAYOUT = ANSI_ISO_JIS
+#LAYOUT = ANSI_ISO_JIS
+LAYOUT = SPACE_FN
 #LAYOUT = DVORAK
 #LAYOUT = TEST_COLS
 #LAYOUT = TEST_ROWS
@@ -70,7 +71,7 @@ TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC =	main.c hw_interface.c lib/usb_keyboard_debug.c lib/print.c
+SRC =	main.c hw_interface.c lib/usb_keyboard_debug.c lib/print.c logic.c
 
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
@@ -606,6 +607,7 @@ clean_list :
 	rm -f *.d 	lib/*.d 	models/*.d 	
 	rm -f *.i 	lib/*.i 	models/*.i 	
 	rm -f *~    lib/*~    models/*~    
+	rm -f test/test_all test/test_spacefn 
 
 
 # Create object files directory
@@ -620,3 +622,22 @@ $(shell mkdir $(OBJDIR) 2>/dev/null)
 .PHONY : all begin finish end sizebefore sizeafter gccversion \
 build elf hex eep lss sym coff extcoff \
 clean clean_list program debug gdb-config
+
+test: test_all test_spacefn
+
+TESTCFLAGS  = -DUNIT_TEST
+TESTCFLAGS += -Duint8_t="unsigned char"
+TESTCFLAGS += -Duint16_t="unsigned short"
+TESTCFLAGS += -Duint32_t="unsigned long"
+#any model should do
+TESTCFLAGS += -DKEYBOARD_MODEL=\"models/$(MODEL).h\"
+
+TESTCSRC  = test/CuTest.c test/AllTests.c test/KbdTest.c logic.c
+
+test_all :
+	gcc $(TESTCFLAGS) -DKEYBOARD_LAYOUT=TEST_UNIT_TEST $(TESTCSRC) -o test/test_all
+	./test/test_all
+
+test_spacefn :
+	gcc $(TESTCFLAGS) -DKEYBOARD_LAYOUT=SPACE_FN -DTEST_SPACEFN $(TESTCSRC) -o test/test_spacefn
+	./test/test_spacefn

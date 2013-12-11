@@ -27,23 +27,36 @@
 #include "lib/usb_keyboard_debug.h"
 #include "lib/print.h"
 #include "hw_interface.h"
-#include KEYBOARD_MODEL
-
-
-struct {uint8_t type; uint8_t value;} layout[] = KEYBOARD_LAYOUT;
-struct {uint8_t pressed; uint8_t bounce;} key[NKEY];
-
-uint8_t queue[7] = {255,255,255,255,255,255,255};
-uint8_t mod_keys = 0;
 
 void init(void);
 void send(void);
 void key_press(uint8_t k);
 void key_release(uint8_t k);
+void make_dualrole_tap_impossible();
+void make_dualrole_modifier_possible();
 void debug_print(void);
+
+
+extern uint8_t active_layer;
+extern struct {uint8_t pressed; uint8_t bounce;} key[NKEY];
+extern uint8_t queue[7];
+extern uint8_t mod_keys;
+
+extern uint32_t tick;
+extern bool dualrole_tap_possible;
+extern bool dualrole_modifier_possible;
+extern uint32_t dualrole_tap_impossible_after_tick;
+extern uint32_t dualrole_modifier_impossible_until_tick;
 
 ISR(SCAN_INTERRUPT_FUNCTION) {
   poll_timer_disable();
+  tick ++;
+  if( dualrole_tap_possible && tick == dualrole_tap_impossible_after_tick )
+    make_dualrole_tap_impossible();
+
+  if( dualrole_tap_possible && !dualrole_modifier_possible && tick == dualrole_modifier_impossible_until_tick )
+    make_dualrole_modifier_possible();
+
   for(uint8_t r = 0, k = 0; r < NROW; r++) {
     pull_row(r);
     for(uint8_t c = 0; c < NCOL; c++, k++) {
@@ -52,7 +65,7 @@ ISR(SCAN_INTERRUPT_FUNCTION) {
         key_press(k);
       if(key[k].bounce == 0b10000000 &&  key[k].pressed)
         key_release(k);
-      
+
       key[k].bounce <<= 1;
     }
   }
@@ -60,9 +73,30 @@ ISR(SCAN_INTERRUPT_FUNCTION) {
   // if(mod_keys == (uint8_t)(KC_LSFT | KC_RSFT))
   //   jump_bootloader();
   update_leds(keyboard_leds);
+
+  /*if(active_layer == 1)*/
+    /*PORTB = PORTB & 0b01111111;*/
+  /*else*/
+    /*PORTB = PORTB | 0b10000000;*/
+
+  /*if(active_layer == 2)*/
+    /*PORTC = PORTC & 0b11011111;*/
+  /*else*/
+    /*PORTC = PORTC | 0b00100000;*/
+
+  /*if(tick % 1000 > 100)*/
+    /*PORTC = PORTC | 0b01000000;*/
+  /*else*/
+    /*PORTC = PORTC & 0b10111111;*/
+
+  if(active_layer == 1)
+    PORTC = PORTC & 0b11011111;
+  else
+    PORTC = PORTC | 0b00100000;
+
 #ifdef DEBUG
   debug_print();
-#endif  
+#endif
   poll_timer_enable();
 }
 
@@ -70,42 +104,6 @@ int main(void) {
   init();
   poll_timer_enable();
   for(ever);
-}
-
-void send(void) {
-  uint8_t i;
-  for(i = 0; i < 6; i++)
-    keyboard_keys[i] = queue[i]<255? layout[queue[i]].value: 0;
-  keyboard_modifier_keys = mod_keys;
-  usb_keyboard_send();
-}
-
-void key_press(uint8_t k) {
-  uint8_t i;
-  key[k].pressed = true;
-  if(IS_MODIFIER(layout[k]))
-    mod_keys |= layout[k].value;
-  else {
-    for(i = 5; i > 0; i--) 
-      queue[i] = queue[i-1];
-    queue[0] = k;
-  }
-  send();
-}
-
-void key_release(uint8_t k) {
-  uint8_t i;
-  key[k].pressed = false;
-  if(IS_MODIFIER(layout[k]))
-    mod_keys &= ~layout[k].value;
-  else {
-    for(i = 0; i < 6; i++) 
-      if(queue[i]==k)
-        break;
-    for(i = i; i < 6; i++)
-      queue[i] = queue[i+1];
-  }
-  send();
 }
 
 void init(void) {
