@@ -94,9 +94,14 @@ ISR(SCAN_INTERRUPT_FUNCTION) {
   else
     PORTC = PORTC | 0b00100000;
 
-#ifdef DEBUG
+  if(active_layer == 2)
+    PORTC = PORTC & 0b10111111;
+  else
+    PORTC = PORTC | 0b01000000;
+
+/*#ifdef DEBUG*/
   debug_print();
-#endif
+/*#endif*/
   poll_timer_enable();
 }
 

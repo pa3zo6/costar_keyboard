@@ -51,9 +51,19 @@ struct KeyDef {
 #define IS_TAPPABLE_LAYERSHIFT(key)   ((TYPE(key) & 0xff) == TAPPABLE_LAYERSHIFT)
 #define IS_MODDED(key)                ((VALUE(key) & 0xff00) != 0)
 
+#define WAS_MODIFIER(key)              ((WAS_TYPE(key) & 0xff) == MODIFIER)
+#define WAS_TAPPABLE_MODIFIER(key)     ((WAS_TYPE(key) & 0xff) == TAPPABLE_MODIFIER)
+#define WAS_LAYERLOCK(key)             ((WAS_TYPE(key) & 0xff) == LAYERLOCK)
+#define WAS_TAPPABLE_LAYERSHIFT(key)   ((WAS_TYPE(key) & 0xff) == TAPPABLE_LAYERSHIFT)
+#define WAS_MODDED(key)                ((WAS_VALUE(key) & 0xff00) != 0)
+
 #define GET_LAYER(key)                  ((TYPE(key)&0xff00) >> 8)
 #define GET_TAPPABLE_MODIFIER(key)      ((TYPE(key)&0xff00) >> 8)
 #define GET_ADDITIONAL_MODIFIERS(key)   ((VALUE(key)&0xff00) >> 8)
+
+#define GET_WAS_LAYER(key)                  ((WAS_TYPE(key)&0xff00) >> 8)
+#define GET_WAS_TAPPABLE_MODIFIER(key)      ((WAS_TYPE(key)&0xff00) >> 8)
+#define GET_WAS_ADDITIONAL_MODIFIERS(key)   ((WAS_VALUE(key)&0xff00) >> 8)
 
 #define LAYER(layer)                {(layer<<8) | TAPPABLE_LAYERSHIFT,  KEY_NO}
 #define LLAYER(layer)               {(layer<<8) | LAYERLOCK,            KEY_NO}
@@ -64,15 +74,33 @@ struct KeyDef {
 
 /* Short names */
 #define KC_NO   {NORMAL, KEY_NO}
+#define KC__    KC_NO
 
-#define KC_LCTL {MODIFIER, 0x01}
-#define KC_LSFT {MODIFIER, 0x02}
-#define KC_LALT {MODIFIER, 0x04}
-#define KC_LGUI {MODIFIER, 0x08}
-#define KC_RCTL {MODIFIER, 0x10}
-#define KC_RSFT {MODIFIER, 0x20}
-#define KC_RALT {MODIFIER, 0x40}
-#define KC_RGUI {MODIFIER, 0x80}
+#define KC_LCTL     {MODIFIER, LCTL}
+#define KC_sLCTL     {MODIFIER, LSFT|LCTL}
+
+#define KC_LSFT     {MODIFIER, LSFT}
+#define KC_sLSFT     {MODIFIER, LSFT|LSFT}
+
+#define KC_LALT     {MODIFIER, LALT}
+#define KC_sLALT     {MODIFIER, LSFT|LALT}
+
+#define KC_LGUI     {MODIFIER, LGUI}
+#define KC_sLGUI     {MODIFIER, LSFT|LGUI}
+
+#define KC_RCTL     {MODIFIER, RCTL}
+#define KC_sRCTL     {MODIFIER, LSFT|RCTL}
+
+#define KC_RSFT     {MODIFIER, RSFT}
+#define KC_sRSFT     {MODIFIER, LSFT|RSFT}
+
+#define KC_RALT     {MODIFIER, RALT}
+#define KC_sRALT     {MODIFIER, LSFT|RALT}
+
+#define KC_RGUI     {MODIFIER, RGUI}
+#define KC_sRGUI     {MODIFIER, LSFT|RGUI}
+
+
 
 #define KC_A    {NORMAL, KEY_A}
 #define KC_aA   {NORMAL, MODDED(A,LALT)}

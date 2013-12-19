@@ -34,8 +34,11 @@ int stash_send_count = 0;
 
 uint8_t usb_keyboard_send(void) {
   uint8_t i;
-  for(i=0; i<6; i++)
+  for(i=0; i<6; i++) {
     log_keyboard_keys[send_count][i] = keyboard_keys[i];
+    /*printf("%d ", keyboard_keys[i]);*/
+  }
+  /*printf("\n");*/
 
   log_mods[send_count] = keyboard_modifier_keys;
   send_count ++;
@@ -87,6 +90,7 @@ void TestKeyModded(CuTest* tc)
   THEN NOKEYS;
 }
 
+
 void TestLayerLock(CuTest* tc)
 {
   START_KEY_CAPTURE;
@@ -116,6 +120,31 @@ void TestLayerLock(CuTest* tc)
 
   THEN KEY(0);
   THEN   NOKEYS;
+}
+
+void TestModModded(CuTest* tc)
+{
+  START_KEY_CAPTURE;
+
+  SHOULDNOT_SEND;
+  key_press(7);//toggle layer to 1
+  CuAssertIntEquals(tc, 1, active_layer);
+  key_release(7);
+  CuAssertIntEquals(tc, 1, active_layer);
+  VERIFY_DIDNOT_SEND;
+
+  key_press(2);//sLALT 
+  key_release(2);//sLALT 
+
+  SHOULDNOT_SEND;
+  key_press(7);//toggle layer to 0
+  CuAssertIntEquals(tc, 0, active_layer);
+  key_release(7);
+  CuAssertIntEquals(tc, 0, active_layer);
+  VERIFY_DIDNOT_SEND;
+
+  VERIFY NOKEYS WITH(LSFT|LALT);
+  THEN NOKEYS;
 }
 
 void TestLayerLockActsAsLayerShift(CuTest *tc) {
@@ -258,12 +287,15 @@ void TestRollover(CuTest *tc) {
   VERIFY_DIDNOT_SEND;
 
   key_press(6);//0 or 1 depending on layer
-  key_release(5);
-  key_release(6);
+  EXPECT_SENT(3);
 
+  key_release(5);
+
+  key_release(6);
   EXPECT_SENT(4);
+
   VERIFY KEY(F);
-  THEN   KEYS2(0,F);
+  THEN   NOKEYS;
   THEN   KEY(0);
   THEN   NOKEYS;
 }
@@ -274,11 +306,37 @@ void TestCancel(CuTest *tc) {
   SHOULDNOT_SEND;
   key_press(5);//F or layer 1
   VERIFY_DIDNOT_SEND;
-  make_dualrole_tap_impossible();//preten too much time has passed
+  make_dualrole_tap_impossible();//pretend too much time has passed
 
   SHOULDNOT_SEND;
   key_release(5);
   VERIFY_DIDNOT_SEND;
+}
+
+void TestComplicated(CuTest *tc) {
+  START_KEY_CAPTURE;
+
+  SHOULDNOT_SEND;
+  key_press(5);//F or layer 1
+  VERIFY_DIDNOT_SEND;
+  CuAssertIntEquals(tc, 1, active_layer);
+  make_dualrole_modifier_possible();//pretend enough time has passed
+
+  key_press(0);//LSFT of LBRACKET
+  key_release(0);
+
+  CuAssertIntEquals(tc, 1, active_layer);
+
+  SHOULDNOT_SEND;
+  key_release(5);
+  VERIFY_DIDNOT_SEND;
+
+  CuAssertIntEquals(tc, 0, active_layer);
+
+  EXPECT_SENT(3);
+  VERIFY NOKEYS WITH(LSFT);
+  THEN KEY(LBRACKET);
+  THEN NOKEYS;
 }
 
 void TestSpaceFn(CuTest *tc) {
@@ -329,6 +387,7 @@ CuSuite* CuStringGetSuite(void)
   SUITE_ADD_TEST(suite, TestKey);
   SUITE_ADD_TEST(suite, TestKeyModded);
   SUITE_ADD_TEST(suite, TestLayerLock);
+  SUITE_ADD_TEST(suite, TestModModded);
   SUITE_ADD_TEST(suite, TestLayerLockActsAsLayerShift);
   SUITE_ADD_TEST(suite, TestLayerShiftOrKeyCanShift);
   SUITE_ADD_TEST(suite, TestLayerShiftOrKeyCanTap);
@@ -338,6 +397,7 @@ CuSuite* CuStringGetSuite(void)
   SUITE_ADD_TEST(suite, TestModifierTapRelease);
   SUITE_ADD_TEST(suite, TestRollover);
   SUITE_ADD_TEST(suite, TestCancel);
+  SUITE_ADD_TEST(suite, TestComplicated);
 #endif
 
   return suite;

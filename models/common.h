@@ -95,20 +95,53 @@
 // ---------------------------------------------------------------------------------------------------------------------
 #define SPACE_FN {\
   /*--- Layer 0 ----------------------------------------------------------------------------------------------------*/ \
-  KEYMAP(ESC,         0,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12,  PSCR,SLCK,PAUS,                       \
+  KEYMAP(ESC,        F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12,  PSCR,SLCK,PAUS,                       \
          ESC,    1,   2,   3,   4,   5,   6,   7,   8,   9,   0,MINS, EQL,BSPC,   INS,HOME,PGUP,  NLCK,PSLS,PAST,PMNS, \
          TAB,    Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,LBRC,RBRC,BSLS,   DEL, END,PGDN,    P7,  P8,  P9,PPLS, \
          CAPS,   A,   S,   D,   F,   G,   H,   J,   K,   L,SCLN,QUOT,      ENT,                     P4,  P5,  P6,      \
          LSFT,NUBS,   Z,   X,   C,   V,   B,   N,   M,COMM, DOT,SLSH,     RSFT,         UP,         P1,  P2,  P3,PENT, \
          LCTL,LGUI,LALT,             SPCFN1,               RALT,RGUI,APP1,RCTL,  LEFT,DOWN,RGHT,    P0,     PDOT     ),\
   /*--- Layer 1 ----------------------------------------------------------------------------------------------------*/ \
-  KEYMAP(ESC,         0,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12,  PSCR,SLCK,PAUS,                       \
+  KEYMAP(ESC,        F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12,  PSCR,SLCK,PAUS,                       \
          ESC,   F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, DEL,   INS,HOME,PGUP,  NLCK,PSLS,PAST,PMNS, \
          TAB,    Q,   W, ESC,   R,   T,   Y,HOME,  UP, END,PSCR,SLCK,PAUS, INS,   DEL, END,PGDN,    P7,  P8,  P9,PPLS, \
          CAPS,   A,   S,   D,   F,   G,PGUP,LEFT,DOWN,RGHT,SCLN,QUOT,      ENT,                     P4,  P5,  P6,      \
          LSFT,NUBS,   Z,   X,   C, SPC,PGDN, GRV,sGRV,COMM, DOT, APP,     RSFT,          UP,        P1,  P2,  P3,PENT, \
          LCTL,LGUI,LALT,                SPC,               RALT,RGUI,APP1,RCTL,   LEFT,DOWN,RGHT,   P0,     PDOT     ),\
   }
+
+// ==== Space FN 4 mooswa ==============================================================================================
+#define KC_LSB        TMODIFIER(LSFT, KEY_LBRACKET)
+#define KC_RSB        TMODIFIER(RSFT, KEY_RBRACKET)
+#define KC_CTRLESC    TMODIFIER(LCTL, KEY_ESCAPE)
+#define KC_FN2s9      TLAYER(2, MODDED(9, LSFT))
+#define KC_FN2s0      TLAYER(2, MODDED(0, LSFT))
+#define KC_RSs0       TMODIFIER(RSFT, MODDED(0, RSFT))
+// ---------------------------------------------------------------------------------------------------------------------
+#define SPACE_FN_MOOSWA {\
+  /*--- Layer 0 ------------------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(      0,             _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _, _,_,_,           \
+             ESC,      1,     2,     3,     4,     5,     6,     7,     8,     9,     0,  MINS,   EQL,  BSPC, _,_,_, _,_,_,_,  \
+             TAB,      Q,     W,     E,     R,     T,     Y,     U,     I,     O,     P,  LBRC,  RBRC,  BSLS, _,_,_, _,_,_,_,  \
+         CTRLESC,      A,     S,     D,     F,     G,     H,     J,     K,     L,  SCLN,  QUOT,          ENT,        _,_,_,    \
+           FN2s9,   NUBS,     Z,     X,     C,     V,     B,     N,     M,  COMM,   DOT,  SLSH,        FN2s0,   _,   _,_,_,_,  \
+            LCTL,   LGUI,  LALT,                     SPCFN1,                RALT,  RGUI,  APP1,  RCTL,        _,_,_, _,  _  ) ,\
+  /*--- Layer 1 ------------------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(  1,        NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  PSCR,SLCK,PAUS,                       \
+         GRV,   F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, DEL,   INS,HOME,PGUP,  NLCK,PSLS,PAST,PMNS, \
+         TAB,    Q,   W, EQL,   R,sGRV,HOME,PGDN,PGUP, END,sEQL,LBRC,RBRC,BSLS,   DEL, END,PGDN,    P7,  P8,  P9,PPLS, \
+      CTRLESC,   A,   S,   D,   F, GRV,LEFT,DOWN,  UP,RGHT,SCLN,QUOT,      ENT,                     P4,  P5,  P6,      \
+          LSB,NUBS,   Z,   X,   C,   V, SPC,   N,MINS,COMM, DOT,BSLS,      RSB,          UP,        P1,  P2,  P3,PENT, \
+         LCTL,LGUI,LALT,                SPC,               RALT,RGUI,APP1,RCTL,   LEFT,DOWN,RGHT,   P0,     PDOT     ),\
+  /*--- Layer 2 ----------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(      2,             _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _, _,_,_,           \
+            sESC,     s1,    s2,    s3,    s4,    s5,    s6,    s7,    s8,    s9,    s0, sMINS,  sEQL, sBSPC, _,_,_, _,_,_,_,  \
+            sTAB,     sQ,    sW,    sE,    sR,    sT,    sY,    sU,    sI,    sO,    sP, sLBRC, sRBRC, sBSLS, _,_,_, _,_,_,_,  \
+         CTRLESC,     sA,    sS,    sD,    sF,    sG,    sH,    sJ,    sK,    sL, sSCLN, sQUOT,         sENT,        _,_,_,    \
+           sLBRC,  sNUBS,    sZ,    sX,    sC,    sV,    sB,    sN,    sM, sCOMM,  sDOT, sSLSH,        sRBRC,   _,   _,_,_,_,  \
+           sLCTL,  sLGUI, sLALT,                       sSPC,               sRALT, sRGUI,  APP1, sRCTL,        _,_,_, _,  _  ) ,\
+  }
+
 
 
 
