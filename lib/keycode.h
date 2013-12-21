@@ -45,16 +45,18 @@ struct KeyDef {
 #define LAYERLOCK             0x03
 #define TAPPABLE_LAYERSHIFT   0x04
 
+#define IS_NORMAL(key)                ((TYPE(key) & 0xff) == NORMAL)
 #define IS_MODIFIER(key)              ((TYPE(key) & 0xff) == MODIFIER)
 #define IS_TAPPABLE_MODIFIER(key)     ((TYPE(key) & 0xff) == TAPPABLE_MODIFIER)
-#define IS_LAYERLOCK(key)             ((TYPE(key) & 0xff) == LAYERLOCK)
-#define IS_TAPPABLE_LAYERSHIFT(key)   ((TYPE(key) & 0xff) == TAPPABLE_LAYERSHIFT)
+#define IS_LAYERLOCK(key)             ((TYPE(key) & 0x7f) == LAYERLOCK)
+#define IS_TAPPABLE_LAYERSHIFT(key)   ((TYPE(key) & 0x7f) == TAPPABLE_LAYERSHIFT)
 #define IS_MODDED(key)                ((VALUE(key) & 0xff00) != 0)
 
+#define WAS_NORMAL(key)                ((WAS_TYPE(key) & 0xff) == NORMAL)
 #define WAS_MODIFIER(key)              ((WAS_TYPE(key) & 0xff) == MODIFIER)
 #define WAS_TAPPABLE_MODIFIER(key)     ((WAS_TYPE(key) & 0xff) == TAPPABLE_MODIFIER)
-#define WAS_LAYERLOCK(key)             ((WAS_TYPE(key) & 0xff) == LAYERLOCK)
-#define WAS_TAPPABLE_LAYERSHIFT(key)   ((WAS_TYPE(key) & 0xff) == TAPPABLE_LAYERSHIFT)
+#define WAS_LAYERLOCK(key)             ((WAS_TYPE(key) & 0x7f) == LAYERLOCK)
+#define WAS_TAPPABLE_LAYERSHIFT(key)   ((WAS_TYPE(key) & 0x7f) == TAPPABLE_LAYERSHIFT)
 #define WAS_MODDED(key)                ((WAS_VALUE(key) & 0xff00) != 0)
 
 #define GET_LAYER(key)                  ((TYPE(key)&0xff00) >> 8)
@@ -65,10 +67,11 @@ struct KeyDef {
 #define GET_WAS_TAPPABLE_MODIFIER(key)      ((WAS_TYPE(key)&0xff00) >> 8)
 #define GET_WAS_ADDITIONAL_MODIFIERS(key)   ((WAS_VALUE(key)&0xff00) >> 8)
 
-#define LAYER(layer)                {(layer<<8) | TAPPABLE_LAYERSHIFT,  KEY_NO}
-#define LLAYER(layer)               {(layer<<8) | LAYERLOCK,            KEY_NO}
-#define TLAYER(layer,keyValue)      {(layer<<8) | TAPPABLE_LAYERSHIFT,  keyValue}
-#define TMODIFIER(mod,keyValue)     {(mod<<8)   | TAPPABLE_MODIFIER,    keyValue}
+#define LAYER(layer,onoff)            {(layer<<8) | (onoff << 7) | TAPPABLE_LAYERSHIFT,  KEY_NO}
+#define LLAYER(layer,onoff)           {(layer<<8) | (onoff << 7) | LAYERLOCK,            KEY_NO}
+#define TLAYER(layer,onoff,keyValue)  {(layer<<8) | (onoff << 7) | TAPPABLE_LAYERSHIFT,  keyValue}
+#define TLAYERON(layer,keyValue)      TLAYER(layer,1,keyValue)
+#define TMODIFIER(mod,keyValue)       {(mod<<8)   | TAPPABLE_MODIFIER,    keyValue}
 
 #define MODDED(key, mods) (KEY_##key | ((mods) << 8))
 

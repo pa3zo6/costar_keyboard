@@ -89,15 +89,17 @@ ISR(SCAN_INTERRUPT_FUNCTION) {
   /*else*/
     /*PORTC = PORTC & 0b10111111;*/
 
-  if(active_layer == 1)
+  //space layer
+  if(active_layer & 0b01 && !dualrole_tap_possible)
     PORTC = PORTC & 0b11011111;
   else
     PORTC = PORTC | 0b00100000;
 
-  if(active_layer == 2)
-    PORTC = PORTC & 0b10111111;
+  //shift layer
+  if(active_layer & 0b10 && !dualrole_tap_possible)
+    PORTB = PORTB & 0b01111111;
   else
-    PORTC = PORTC | 0b01000000;
+    PORTB = PORTB | 0b10000000;
 
 /*#ifdef DEBUG*/
   debug_print();

@@ -70,12 +70,13 @@ void TestKey(CuTest* tc)
   key_press(0);//A
   key_release(0);
 
-  key_press(1);//B
-  key_release(1);
+  key_press(0);//A
+  key_release(0);
 
+  EXPECT_SENT(4);
   VERIFY KEY(A);
   THEN   NOKEYS;
-  THEN   KEY(B);
+  THEN   KEY(A);
   THEN   NOKEYS;
 }
 
@@ -86,7 +87,9 @@ void TestKeyModded(CuTest* tc)
   key_press(3);//sD
   key_release(3);
 
-  VERIFY KEY(D) WITH(LSFT);
+  EXPECT_SENT(3);
+  VERIFY NOKEYS WITH(LSFT);
+  THEN KEY(D) WITH(LSFT);
   THEN NOKEYS;
 }
 
@@ -133,8 +136,8 @@ void TestModModded(CuTest* tc)
   CuAssertIntEquals(tc, 1, active_layer);
   VERIFY_DIDNOT_SEND;
 
-  key_press(2);//sLALT 
-  key_release(2);//sLALT 
+  key_press(2);//sLALT
+  key_release(2);//sLALT
 
   SHOULDNOT_SEND;
   key_press(7);//toggle layer to 0
@@ -225,8 +228,9 @@ void TestModifierOrKeyCanTap(CuTest *tc) {
   key_release(4);
 
 
-  EXPECT_SENT(3);
+  EXPECT_SENT(4);
   VERIFY NOKEYS WITH(LSFT);
+  THEN   NOKEYS NOMODS;
   THEN   KEY(Z) NOMODS;
   THEN   NOKEYS NOMODS;
 }
@@ -259,7 +263,10 @@ void TestModifierTapModded(CuTest *tc) {
   key_press(2);//rshift or )
   key_release(2);
 
+  EXPECT_SENT(5);
   VERIFY NOKEYS WITH(RSFT);
+  THEN   NOKEYS NOMODS;
+  THEN   NOKEYS WITH(LSFT);
   THEN   KEY(9) WITH(LSFT);
   THEN   NOKEYS NOMODS;
 }
@@ -282,14 +289,19 @@ void TestModifierTapRelease(CuTest *tc) {
 void TestRollover(CuTest *tc) {
   START_KEY_CAPTURE;
 
+  CuAssertIntEquals(tc, 0, active_layer);
+
   SHOULDNOT_SEND;
   key_press(5);//F or layer 1
   VERIFY_DIDNOT_SEND;
+  CuAssertIntEquals(tc, 1, active_layer);
 
   key_press(6);//0 or 1 depending on layer
   EXPECT_SENT(3);
+  CuAssertIntEquals(tc, 0, active_layer);//layer already reset
 
   key_release(5);
+  CuAssertIntEquals(tc, 0, active_layer);
 
   key_release(6);
   EXPECT_SENT(4);
@@ -333,8 +345,9 @@ void TestComplicated(CuTest *tc) {
 
   CuAssertIntEquals(tc, 0, active_layer);
 
-  EXPECT_SENT(3);
+  EXPECT_SENT(4);
   VERIFY NOKEYS WITH(LSFT);
+  THEN NOKEYS NOMODS;
   THEN KEY(LBRACKET);
   THEN NOKEYS;
 }

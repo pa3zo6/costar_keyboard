@@ -26,6 +26,13 @@ PROGMEM Layer layers[] = KEYBOARD_LAYOUT;
 #define WAS_KEY(k)   (WAS_VALUE(k) & 0xff)
 #define WAS_PRESSED_ON_LAYER(k) (key[k].pressed & 0x7f)
 
+#define LAYERBIT_OFF(bitNum)  (active_layer & ~(1 << (bitNum-1)))
+#define LAYERBIT_ON(bitNum)   (active_layer |  (1 << (bitNum-1)))
+
+#define KEY_SETS_LAYERBIT_ON(k) (WAS_TYPE(k) & 0x80)
+#define ENGAGE_LAYER(k)         (KEY_SETS_LAYERBIT_ON(k) ? LAYERBIT_ON(GET_WAS_LAYER(k)) : LAYERBIT_OFF(GET_WAS_LAYER(k)))
+#define DISENGAGE_LAYER(k)      (KEY_SETS_LAYERBIT_ON(k) ? LAYERBIT_OFF(GET_WAS_LAYER(k)) : LAYERBIT_ON(GET_WAS_LAYER(k)))
+
 uint8_t usb_keyboard_send(void);
 
 struct {uint8_t pressed; uint8_t bounce;} key[NKEY];
@@ -64,15 +71,16 @@ void make_dualrole_modifier_possible() {
 
 void key_press(uint8_t k) {
   uint8_t i;
-  key[k].pressed = 0x80 | active_layer;
 
+  key[k].pressed = 0x80 | active_layer;
   if(current_dualrole_key != 255) {
-    if(!dualrole_modifier_possible) {
+    if(!dualrole_modifier_possible && IS_NORMAL(k) && WAS_TAPPABLE_LAYERSHIFT(current_dualrole_key) ) {//TODO do we need dualrole_modifier_possible ?
       for(i = 5; i > 0; i--)
         queue[i] = queue[i-1];
       queue[0] = current_dualrole_key;
 
-      active_layer = WAS_PRESSED_ON_LAYER(current_dualrole_key);
+      active_layer = DISENGAGE_LAYER(current_dualrole_key);
+
       send();
 
       for(i = 0; i < 6; i++)
@@ -107,14 +115,14 @@ void key_press(uint8_t k) {
     dualrole_modifier_impossible_until_tick = tick + SHORTEST_MODIFIER_DURATION;
     current_dualrole_key = k;
 
-    active_layer = GET_LAYER(k);
+    active_layer = ENGAGE_LAYER(k);
   }
   else if(IS_LAYERLOCK(k)) {
     dualrole_tap_possible = true;
     dualrole_modifier_possible = false;
     current_dualrole_key = k;
 
-    active_layer = GET_LAYER(k);
+    active_layer = ENGAGE_LAYER(k);
   }
   else if(IS_MODIFIER(k)) {
     mod_keys |= KEY(k);
@@ -140,7 +148,7 @@ void key_release(uint8_t k) {
 
   if(WAS_TAPPABLE_LAYERSHIFT(k)) {
 
-    active_layer = WAS_PRESSED_ON_LAYER(k);
+    active_layer = DISENGAGE_LAYER(k);
 
     if(dualrole_tap_possible) {
 
@@ -165,7 +173,7 @@ void key_release(uint8_t k) {
 
     } else {
 
-      active_layer = WAS_PRESSED_ON_LAYER(k);
+      active_layer = DISENGAGE_LAYER(k);
 
     }
     current_dualrole_key = 255;
@@ -174,6 +182,7 @@ void key_release(uint8_t k) {
     if(dualrole_tap_possible) {
 
       mod_keys &= ~GET_WAS_TAPPABLE_MODIFIER(k);
+      send();
 
       for(i = 5; i > 0; i--)
         queue[i] = queue[i-1];
@@ -221,17 +230,27 @@ void key_release(uint8_t k) {
 void send(void) {
   uint8_t i;
   uint8_t addtnl_mod_keys = 0;
+
   for(i = 0; i < 6; i++) {
     if(queue[i] < 255) {
-
       uint8_t k = queue[i];
 
       if(WAS_MODDED(k)) {
         addtnl_mod_keys |= GET_WAS_ADDITIONAL_MODIFIERS(k);
       }
+    }
+  }
 
+  //sending the new modifiers first, seems to help some OSes
+  if((addtnl_mod_keys & ~mod_keys) != 0) {
+    keyboard_modifier_keys = mod_keys | addtnl_mod_keys;
+    usb_keyboard_send();
+  }
+
+  for(i = 0; i < 6; i++) {
+    if(queue[i] < 255) {
+      uint8_t k = queue[i];
       keyboard_keys[i] = KEY(k);
-
     } else {
       keyboard_keys[i] = 0;
     }

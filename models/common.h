@@ -9,8 +9,8 @@
 #include <util/delay.h>
 #endif
 
-#include "../lib/avr_extra.h"
 #include "../lib/keycode.h"
+#include "../lib/avr_extra.h"
 
 #define STR_MANUFACTURER L"Bathroom Epiphanies, Costar Keyboard -"
 #define VENDOR_ID        0x16C0
@@ -90,8 +90,8 @@
 
 
 // ==== Space FN =======================================================================================================
-#define KC_SPCFN1   TLAYER(1, KEY_SPACE)                                        /*Tap to space, hold switch to Layer 1*/
-#define KC_APP1     TLAYER(1, KEY_APPLICATION)                            /*Tap to Application, hold switch to Layer 1*/
+#define KC_SPCFN1   TLAYERON(1, KEY_SPACE)                                      /*Tap to space, hold switch to Layer 1*/
+#define KC_APP1     TLAYERON(1, KEY_APPLICATION)                          /*Tap to Application, hold switch to Layer 1*/
 // ---------------------------------------------------------------------------------------------------------------------
 #define SPACE_FN {\
   /*--- Layer 0 ----------------------------------------------------------------------------------------------------*/ \
@@ -112,35 +112,60 @@
 
 // ==== Space FN 4 mooswa ==============================================================================================
 #define KC_LSB        TMODIFIER(LSFT, KEY_LBRACKET)
+#define KC_sLSB       TMODIFIER(LSFT, MODDED(LBRACKET,RSFT))
 #define KC_RSB        TMODIFIER(RSFT, KEY_RBRACKET)
+#define KC_sRSB       TMODIFIER(RSFT, MODDED(RBRACKET,RSFT))
 #define KC_CTRLESC    TMODIFIER(LCTL, KEY_ESCAPE)
-#define KC_FN2s9      TLAYER(2, MODDED(9, LSFT))
-#define KC_FN2s0      TLAYER(2, MODDED(0, LSFT))
-#define KC_RSs0       TMODIFIER(RSFT, MODDED(0, RSFT))
+#define KC_CTRLENT    TMODIFIER(RCTL, KEY_ENTER)
+#define KC_FN2s9      TLAYERON(2, MODDED(9, LSFT))
+#define KC_FN2s0      TLAYERON(2, MODDED(0, LSFT))
+#define KC_RSs0       TMODIFIER(RSFT, MODDED(0, LSFT))
+
+#define KC_CTLMNS     TMODIFIER(LCTL, KEY_MINUS)
+#define KC_sCTLUN     TMODIFIER(LSFT|LCTL, MODDED(MINUS, LSFT))
+
+#define KC_sALTMN     TMODIFIER(LSFT|LCTL, KEY_MINUS)
+#define KC_ALTUND     TMODIFIER(LALT, MODDED(MINUS, LSFT))
+
+#define KC_CTLPLS     TMODIFIER(RCTL, MODDED(EQUAL, LSFT))
+#define KC_sCTLEQ     TMODIFIER(LSFT|RCTL, KEY_EQUAL)
+
+#define KC_sALTPL     TMODIFIER(LSFT|RCTL, MODDED(EQUAL, LSFT))
+#define KC_ALTEQL     TMODIFIER(RALT, KEY_EQUAL)
+
+#define KC_sSPCFN1    TLAYERON(1, MODDED(SPACE,LSFT))                      /*Tap to shift+space, hold switch to Layer 1*/
 // ---------------------------------------------------------------------------------------------------------------------
 #define SPACE_FN_MOOSWA {\
-  /*--- Layer 0 ------------------------------------------------------------------------------------------------------------*/ \
-  KEYMAP(      0,             _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _, _,_,_,           \
-             ESC,      1,     2,     3,     4,     5,     6,     7,     8,     9,     0,  MINS,   EQL,  BSPC, _,_,_, _,_,_,_,  \
-             TAB,      Q,     W,     E,     R,     T,     Y,     U,     I,     O,     P,  LBRC,  RBRC,  BSLS, _,_,_, _,_,_,_,  \
-         CTRLESC,      A,     S,     D,     F,     G,     H,     J,     K,     L,  SCLN,  QUOT,          ENT,        _,_,_,    \
-           FN2s9,   NUBS,     Z,     X,     C,     V,     B,     N,     M,  COMM,   DOT,  SLSH,        FN2s0,   _,   _,_,_,_,  \
-            LCTL,   LGUI,  LALT,                     SPCFN1,                RALT,  RGUI,  APP1,  RCTL,        _,_,_, _,  _  ) ,\
-  /*--- Layer 1 ------------------------------------------------------------------------------------------------------------*/ \
-  KEYMAP(  1,        NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  NO,  PSCR,SLCK,PAUS,                       \
-         GRV,   F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9, F10, F11, F12, DEL,   INS,HOME,PGUP,  NLCK,PSLS,PAST,PMNS, \
-         TAB,    Q,   W, EQL,   R,sGRV,HOME,PGDN,PGUP, END,sEQL,LBRC,RBRC,BSLS,   DEL, END,PGDN,    P7,  P8,  P9,PPLS, \
-      CTRLESC,   A,   S,   D,   F, GRV,LEFT,DOWN,  UP,RGHT,SCLN,QUOT,      ENT,                     P4,  P5,  P6,      \
-          LSB,NUBS,   Z,   X,   C,   V, SPC,   N,MINS,COMM, DOT,BSLS,      RSB,          UP,        P1,  P2,  P3,PENT, \
-         LCTL,LGUI,LALT,                SPC,               RALT,RGUI,APP1,RCTL,   LEFT,DOWN,RGHT,   P0,     PDOT     ),\
-  /*--- Layer 2 ----------------------------------------------------------------------------------------------------*/ \
-  KEYMAP(      2,             _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _, _,_,_,           \
-            sESC,     s1,    s2,    s3,    s4,    s5,    s6,    s7,    s8,    s9,    s0, sMINS,  sEQL, sBSPC, _,_,_, _,_,_,_,  \
-            sTAB,     sQ,    sW,    sE,    sR,    sT,    sY,    sU,    sI,    sO,    sP, sLBRC, sRBRC, sBSLS, _,_,_, _,_,_,_,  \
-         CTRLESC,     sA,    sS,    sD,    sF,    sG,    sH,    sJ,    sK,    sL, sSCLN, sQUOT,         sENT,        _,_,_,    \
+  /*--- Layer 00 -----------------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(    ESC,             _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _, _,_,_,           \
+             GRV,      1,     2,     3,     4,     5,     6,     7,     8,     9,     0,     _,     _,  BSPC, _,_,_, _,_,_,_,  \
+             TAB,      Q,     W,     E,     R,     T,     Y,     U,     I,     O,     P,  BSPC,  BSPC,  BSLS, _,_,_, _,_,_,_,  \
+         CTRLESC,      A,     S,     D,     F,     G,     H,     J,     K,     L,  SCLN,  QUOT,      CTRLENT,        _,_,_,    \
+           FN2s9,   NUBS,     Z,     X,     C,     V,     B,     N,     M,  COMM,   DOT,  SLSH,        FN2s0,    _,  _,_,_,_,  \
+          CTLMNS,   LGUI,ALTUND,                     SPCFN1,              ALTEQL,  RGUI,CTLPLS, CTLPLS,        _,_,_, _, _   ),\
+  /*--- Layer 01 -----------------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(      _,             _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _, _,_,_,           \
+             GRV,     F1,    F2,    F3,    F4,    F5,    F6,    F7,    F8,    F9,   F10,   F11,   F12,   DEL, _,_,_, _,_,_,_,  \
+             TAB,      Q,    P7,    P8,    P9,     T,  HOME,  PGDN,  PGUP,   END,  PSCR,   DEL,   DEL,  BSLS, _,_,_, _,_,_,_,  \
+         CTRLESC,   PDOT,    P4,    P5,    P6,    P0,  LEFT,  DOWN,    UP,  RGHT,  SCLN,  QUOT,      CTRLENT,        _,_,_,    \
+             LSB,   NUBS,     Z,    P1,    P2,    P3,   SPC,   INS,   APP,  COMM,   DOT,  BSLS,          RSB,    _,  _,_,_,_,  \
+            LCTL,   LGUI,  LALT,                          _,                RALT,  RGUI,  RCTL,   RCTL,        _,_,_, _, _   ),\
+  /*--- Layer 10 -----------------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(      _,             _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _, _,_,_,           \
+            sGRV,     s1,    s2,    s3,    s4,    s5,    s6,    s7,    s8,    s9,    s0,     _,     _, sBSPC, _,_,_, _,_,_,_,  \
+            sTAB,     sQ,    sW,    sE,    sR,    sT,    sY,    sU,    sI,    sO,    sP, sBSPC, sBSPC, sBSLS, _,_,_, _,_,_,_,  \
+         CTRLESC,     sA,    sS,    sD,    sF,    sG,    sH,    sJ,    sK,    sL, sSCLN, sQUOT,      CTRLENT,        _,_,_,    \
            sLBRC,  sNUBS,    sZ,    sX,    sC,    sV,    sB,    sN,    sM, sCOMM,  sDOT, sSLSH,        sRBRC,   _,   _,_,_,_,  \
-           sLCTL,  sLGUI, sLALT,                       sSPC,               sRALT, sRGUI,  APP1, sRCTL,        _,_,_, _,  _  ) ,\
+          sCTLUN,  sLGUI,sALTMN,                    sSPCFN1,              sALTPL, sRGUI,sCTLEQ,sCTLEQ,        _,_,_, _,  _   ),\
+  /*--- Layer 11 -----------------------------------------------------------------------------------------------------------*/ \
+  KEYMAP(      _,             _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _,     _, _,_,_,           \
+            sGRV,    sF1,   sF2,   sF3,   sF4,   sF5,   sF6,   sF7,   sF8,   sF9,  sF10,  sF11,  sF12,  sDEL, _,_,_, _,_,_,_,  \
+            sTAB,     sQ,    sW,    sE,    sR,    sT, sHOME, sPGDN, sPGUP,  sEND, sPSCR,  sDEL,  sDEL, sBSLS, _,_,_, _,_,_,_,  \
+         CTRLESC,     sA,    sS,    sD,    sF,    sG, sLEFT, sDOWN,   sUP, sRGHT, sSCLN, sQUOT,      CTRLENT,        _,_,_,    \
+            sLSB,  sNUBS,    sZ,    sX,    sC,    sV,  sSPC,  sINS,    sM, sCOMM,  sDOT, sBSLS,         sRSB,   _,   _,_,_,_,  \
+           sLCTL,  sLGUI, sLALT,                          _,               sRALT, sRGUI, sRCTL, sRCTL,        _,_,_, _,  _   ),\
   }
+
 
 
 
